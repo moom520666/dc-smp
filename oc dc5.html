@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>DC SMP · 角色设定集</title>
+<style>
+:root{
+  --bg:#f6f7fa;
+  --card:#ffffff;
+  --border:#e7eaf1;
+  --text:#1c2030;
+  --muted:#7b8398;
+  --accent:#4a6cf7;
+  --green:#3fb98a;
+  --red:#e05a6a;
+  --yellow:#e0a020;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  background:var(--bg);color:var(--text);
+  font:15px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button{font-family:inherit;}
+
+/* ===== 顶栏 ===== */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(246,247,250,.94);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:10px 14px 0;
+}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.topbar h1{font-size:16.5px;margin:0;font-weight:650;letter-spacing:.2px;}
+.tools{display:flex;gap:8px;flex-wrap:wrap;}
+.tools button{
+  font-size:12.5px;padding:6px 11px;border-radius:9px;
+  border:1px solid var(--border);background:#fff;color:var(--muted);
+  cursor:pointer;transition:.15s;
+}
+.tools button:hover{color:var(--text);border-color:#ccd4e6;}
+.tools button.hl{
+  background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;
+}
+.tools button.hl:hover{background:#3f5ee6;color:#fff;}
+.search{margin:10px 0 0;}
+.search input{
+  width:100%;padding:9px 14px;border-radius:11px;
+  border:1px solid var(--border);background:#fff;
+  font-size:14px;outline:none;transition:.15s;color:var(--text);
+}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,108,247,.12);}
+.chips{
+  display:flex;gap:8px;overflow-x:auto;padding:10px 0 11px;
+  scrollbar-width:none;
+}
+.chips::-webkit-scrollbar{display:none;}
+.chip{
+  flex:0 0 auto;padding:5px 13px;border-radius:999px;
+  border:1px solid var(--border);background:#fff;
+  font-size:13px;color:var(--muted);cursor:pointer;
+  white-space:nowrap;transition:.15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.chip.active{background:var(--text);color:#fff;border-color:var(--text);}
+.chip.active .dot{box-shadow:0 0 0 2px rgba(255,255,255,.35);}
+
+/* 同步状态 */
+.sync-status{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11.5px;color:var(--muted);
+  padding:4px 10px;border-radius:999px;background:#fff;
+  border:1px solid var(--border);cursor:pointer;
+  transition:.15s;white-space:nowrap;
+}
+.sync-status:hover{border-color:#ccd4e6;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#b6becf;}
+.sync-dot.on{background:var(--green);}
+.sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+/* ===== 卡片列表 ===== */
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(154px,1fr));
+  gap:10px;padding:14px;max-width:1120px;margin:0 auto;
+}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:15px;
+  padding:13px;cursor:pointer;transition:.16s;
+}
+.card:hover{border-color:#c9d3ea;box-shadow:0 6px 20px rgba(30,40,80,.07);}
+.card:active{transform:scale(.985);}
+.card-name{font-weight:600;font-size:14.5px;line-height:1.35;word-break:break-word;}
+.card-camp{
+  font-size:11.5px;margin-top:6px;display:inline-flex;align-items:center;
+  gap:5px;color:var(--muted);
+}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:0 0 auto;}
+.card-intro{
+  font-size:12px;color:#9aa1b2;margin-top:7px;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.empty-tip{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:40px 0;}
+
+/* ===== 详情抽屉 ===== */
+.sheet{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:120;
+  background:#fff;display:none;flex-direction:column;
+}
+.sheet.open{display:flex;animation:sheetIn .22s ease-out;}
+@keyframes sheetIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.sheet-head{
+  display:flex;align-items:center;gap:10px;flex:0 0 auto;
+  padding:10px 12px;border-bottom:1px solid var(--border);background:#fff;
+}
+.sheet-title{
+  flex:1;font-weight:600;font-size:15px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.icon-btn{
+  min-width:34px;height:34px;padding:0 10px;border-radius:10px;
+  border:1px solid var(--border);background:#fff;
+  display:inline-grid;place-items:center;cursor:pointer;
+  font-size:13.5px;color:var(--text);transition:.15s;
+}
+.icon-btn:hover{border-color:#ccd4e6;background:#fafbff;}
+.sheet-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+.graph-card{
+  margin:12px;border:1px solid var(--border);border-radius:16px;
+  background:#fcfcfe;height:330px;overflow:hidden;position:relative;
+}
+.graph-card svg{width:100%;height:100%;display:block;touch-action:manipulation;}
+.graph-hint{
+  position:absolute;left:12px;bottom:9px;font-size:10.5px;color:#a8b0c2;pointer-events:none;
+}
+.graph-legend{
+  position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px;
+  font-size:10.5px;color:#98a0b4;background:rgba(255,255,255,.78);
+  padding:6px 9px;border-radius:9px;pointer-events:none;
+}
+.graph-legend i{display:inline-block;width:16px;height:0;border-top:1.6px solid #9fb1e3;vertical-align:middle;margin-right:5px;}
+.graph-legend .l2{border-top-color:#c9bce4;}
+
+.info{padding:0 18px 48px;}
+.camp-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;padding:4px 11px;border-radius:999px;
+  background:#f3f5fa;color:#5b647c;
+}
+.badge-dot{width:7px;height:7px;border-radius:50%;}
+.camp-detail{font-size:12px;color:var(--muted);}
+.section{margin-top:18px;}
+.section h4{
+  font-size:12.5px;font-weight:600;color:var(--muted);
+  margin:0 0 8px;letter-spacing:.6px;text-transform:uppercase;
+}
+.intro-text{
+  font-size:14px;line-height:1.75;white-space:pre-wrap;word-break:break-word;
+  color:#2c3244;margin:0;
+}
+.rel-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;}
+.rel-item{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  padding:9px 12px;border-radius:11px;background:#f8f9fc;
+  border:1px solid #eef0f6;font-size:13.5px;
+}
+.rel-item[data-id]{cursor:pointer;transition:.15s;}
+.rel-item[data-id]:hover{background:#f1f4fd;border-color:#d9e1f7;}
+.rel-name{font-weight:600;}
+.rel-arrow{color:#c2c9d8;font-size:12px;}
+.rel-label{color:var(--muted);font-size:12.5px;margin-left:auto;text-align:right;}
+.rel-tag{
+  font-size:10px;padding:1px 6px;border-radius:5px;
+  background:#eef2ff;color:#5b74d6;font-weight:600;
+}
+.rel-tag.reverse{background:#f5eeff;color:#8b5bd6;}
+.muted{color:var(--muted);font-size:13px;}
+
+/* ===== 编辑表单 ===== */
+.form{display:flex;flex-direction:column;gap:14px;padding-top:6px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.3px;}
+.field input,.field textarea{
+  width:100%;padding:9px 12px;border-radius:10px;
+  border:1px solid var(--border);background:#fff;
+  font-size:14px;font-family:inherit;color:var(--text);
+  outline:none;transition:.15s;resize:vertical;
+}
+.field input:focus,.field textarea:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,108,247,.12);
+}
+.rel-rows{display:flex;flex-direction:column;gap:10px;}
+.rel-row{
+  display:flex;flex-direction:column;gap:6px;
+  padding:10px;border-radius:12px;background:#f8f9fc;
+  border:1px solid #eef0f6;
+}
+.rel-row-main{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.rel-row .rel-to{flex:1.2;min-width:110px;}
+.rel-row .rel-label{flex:1.2;min-width:110px;}
+.rel-row input[type="text"]{padding:8px 10px;font-size:13.5px;}
+.rel-bi{
+  display:inline-flex;align-items:center;gap:4px;font-size:11.5px;
+  color:var(--muted);background:#fff;padding:5px 8px;border-radius:8px;
+  cursor:pointer;white-space:nowrap;user-select:none;
+  border:1px solid var(--border);
+}
+.rel-bi input{accent-color:var(--accent);width:13px;height:13px;margin:0;}
+.rel-del{
+  flex:0 0 auto;width:32px;height:32px;border-radius:9px;
+  border:1px solid var(--border);background:#fff;color:#c25a6a;
+  cursor:pointer;font-size:15px;line-height:1;
+}
+.rel-del:hover{background:#fff2f4;border-color:#f0ccd3;}
+.rel-back{
+  display:none;align-items:center;gap:8px;
+  padding-top:6px;border-top:1px dashed #e2e7f0;
+}
+.rel-back.show{display:flex;}
+.rel-back-label{flex:1;min-width:100px;}
+.rel-back-tip{font-size:11px;color:#8b5bd6;white-space:nowrap;font-weight:600;}
+
+.add-rel{
+  margin-top:8px;padding:8px;border-radius:10px;
+  border:1px dashed #cfd7e8;background:#fbfcff;color:var(--accent);
+  font-size:13px;cursor:pointer;width:100%;transition:.15s;
+}
+.add-rel:hover{background:#f2f5ff;}
+.form-actions{display:flex;gap:9px;margin-top:6px;flex-wrap:wrap;}
+.form-actions button{
+  flex:1;min-width:88px;padding:10px 14px;border-radius:11px;
+  border:1px solid var(--border);background:#fff;color:var(--text);
+  font-size:14px;cursor:pointer;transition:.15s;
+}
+.form-actions button.primary{
+  background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;
+}
+.form-actions button.primary:hover{background:#3f5ee6;}
+.form-actions button.danger{color:#c25a6a;}
+.form-actions button.danger:hover{background:#fff2f4;border-color:#f0ccd3;}
+
+/* ===== 3D 关系网 ===== */
+.g3d-overlay{
+  position:fixed;inset:0;z-index:100;
+  background:#f6f7fa;
+  display:none;flex-direction:column;
+}
+.g3d-overlay.open{display:flex;animation:g3dIn .24s ease-out;}
+@keyframes g3dIn{from{opacity:0;}to{opacity:1;}}
+.g3d-head{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  flex:0 0 auto;
+}
+.g3d-title{flex:1;font-size:15px;font-weight:650;min-width:100px;}
+.g3d-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.g3d-actions button{
+  font-size:12.5px;padding:6px 11px;border-radius:9px;
+  border:1px solid var(--border);background:#fff;color:var(--muted);
+  cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.g3d-actions button:hover{color:var(--text);border-color:#ccd4e6;}
+.g3d-actions button.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.g3d-canvas-wrap{flex:1;position:relative;overflow:hidden;}
+#g3d-canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab;}
+.g3d-legend{
+  display:flex;flex-wrap:wrap;gap:5px 14px;padding:9px 14px;
+  border-top:1px solid var(--border);background:rgba(255,255,255,.9);
+  font-size:12px;color:var(--muted);flex:0 0 auto;
+}
+.g3d-legend span{display:inline-flex;align-items:center;gap:6px;}
+.g3d-tip{
+  position:absolute;left:12px;bottom:10px;font-size:11px;color:#a8b0c2;
+  pointer-events:none;
+}
+
+/* ===== 设置面板 ===== */
+.settings-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(20,30,60,.4);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;
+  padding:18px;
+}
+.settings-overlay.open{display:flex;}
+.settings-card{
+  background:#fff;border-radius:18px;max-width:480px;width:100%;
+  max-height:88vh;overflow-y:auto;
+  box-shadow:0 24px 70px rgba(20,30,60,.25);
+}
+.settings-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:#fff;z-index:2;
+}
+.settings-head h3{margin:0;font-size:16px;font-weight:650;}
+.settings-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
+.settings-field{display:flex;flex-direction:column;gap:6px;}
+.settings-field label{font-size:12.5px;color:var(--muted);font-weight:600;}
+.settings-field input{
+  width:100%;padding:9px 12px;border-radius:10px;
+  border:1px solid var(--border);background:#fff;
+  font-size:13.5px;font-family:inherit;color:var(--text);
+  outline:none;transition:.15s;
+}
+.settings-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,108,247,.12);}
+.settings-help{
+  font-size:12px;color:var(--muted);line-height:1.6;
+  background:#f8f9fc;padding:11px 13px;border-radius:10px;
+  border:1px solid #eef0f6;
+}
+.settings-help code{
+  background:#eef2ff;color:#4a5fbf;padding:1px 5px;border-radius:4px;
+  font-size:11.5px;font-family:monospace;
+}
+.settings-actions{display:flex;gap:9px;flex-wrap:wrap;}
+.settings-actions button{
+  flex:1;min-width:100px;padding:10px 14px;border-radius:11px;
+  border:1px solid var(--border);background:#fff;color:var(--text);
+  font-size:14px;cursor:pointer;transition:.15s;
+}
+.settings-actions button.primary{
+  background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;
+}
+.settings-actions button.primary:hover{background:#3f5ee6;}
+.settings-actions button.danger{color:#c25a6a;border-color:#f0ccd3;}
+.settings-actions button.danger:hover{background:#fff2f4;}
+.settings-status{
+  display:flex;align-items:center;gap:8px;
+  font-size:12.5px;padding:9px 12px;border-radius:10px;
+  background:#f8f9fc;border:1px solid #eef0f6;
+}
+.settings-status .sync-dot{width:9px;height:9px;}
+
+/* ===== 桌面端 ===== */
+@media (min-width:720px){
+  .sheet{
+    top:18px;bottom:18px;left:50%;right:auto;width:780px;
+    transform:translateX(-50%);
+    border-radius:20px;border:1px solid var(--border);
+    box-shadow:0 24px 70px rgba(20,30,60,.18);
+    overflow:hidden;
+  }
+  .grid{padding:18px;}
+  .graph-card{height:410px;}
+}
+@media (min-width:1024px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <h1>DC SMP · 角色设定集</h1>
+    <div class="tools">
+      <button id="btn-sync" class="sync-status" title="点击打开云端设置">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-text">本地模式</span>
+      </button>
+      <button id="btn-3d" class="hl">3D 关系网</button>
+      <button id="btn-new">＋ 新角色</button>
+      <button id="btn-reset">重置</button>
+    </div>
+  </div>
+  <div class="search"><input id="search" type="search" placeholder="搜索角色 / 关键词…"></div>
+  <div class="chips" id="chips"></div>
+</div>
+
+<main class="grid" id="grid"></main>
+
+<!-- ===== 详情抽屉 ===== -->
+<div class="sheet" id="sheet">
+  <div class="sheet-head">
+    <button class="icon-btn" id="sheet-close">←</button>
+    <div class="sheet-title" id="sheet-title"></div>
+    <button class="icon-btn" id="sheet-edit">编辑</button>
+  </div>
+  <div class="sheet-scroll">
+    <div class="graph-card">
+      <svg id="graph" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="graph-legend">
+        <div><i></i>我 → 对方</div>
+        <div><i class="l2"></i>对方 → 我</div>
+      </div>
+      <div class="graph-hint">点击节点可跳转</div>
+    </div>
+    <div class="info" id="info"></div>
+  </div>
+</div>
+
+<!-- ===== 3D 全角色关系网 ===== -->
+<div class="g3d-overlay" id="g3d-overlay">
+  <div class="g3d-head">
+    <div class="g3d-title">全角色 · 3D 关系网</div>
+    <div class="g3d-actions">
+      <button id="g3d-rotate" class="on">自动旋转</button>
+      <button id="g3d-reset">重置视角</button>
+      <button id="g3d-close">关闭</button>
+    </div>
+  </div>
+  <div class="g3d-canvas-wrap">
+    <canvas id="g3d-canvas"></canvas>
+    <div class="g3d-tip">拖拽旋转 · 滚轮/双指缩放 · 点击节点查看</div>
+  </div>
+  <div class="g3d-legend" id="g3d-legend"></div>
+</div>
+
+<!-- ===== 设置面板（云端同步） ===== -->
+<div class="settings-overlay" id="settings-overlay">
+  <div class="settings-card">
+    <div class="settings-head">
+      <h3>云端数据设置</h3>
+      <button class="icon-btn" id="settings-close">×</button>
+    </div>
+    <div class="settings-body">
+      <div class="settings-status">
+        <span class="sync-dot" id="settings-dot"></span>
+        <span id="settings-status-text">未连接云端 · 使用本地存储</span>
+      </div>
+
+      <div class="settings-help">
+        <strong>如何启用云端共享？</strong><br>
+        1. 前往 <code>supabase.com</code> 免费注册并创建项目<br>
+        2. 在 SQL Editor 中执行下方建表语句<br>
+        3. 将项目 URL 与 anon key 填入下方<br>
+        4. 点击「连接云端」，数据即可多设备共享
+        <div style="margin-top:8px;padding:8px;background:#fff;border-radius:8px;font-family:monospace;font-size:11px;line-height:1.5;overflow-x:auto;white-space:pre;color:#4a5fbf;">create table if not exists dcsmp_data (
+  id int primary key,
+  data jsonb not null default '{"ocs":[]}'::jsonb,
+  updated_at timestamptz default now()
+);
+insert into dcsmp_data (id,data) values (1,'{"ocs":[]}'::jsonb)
+  on conflict (id) do nothing;
+alter table dcsmp_data enable row level security;
+create policy "allow_all" on dcsmp_data
+  for all using (true) with check (true);</div>
+      </div>
+
+      <div class="settings-field">
+        <label>Supabase URL</label>
+        <input id="cfg-url" type="text" placeholder="https://xxxxx.supabase.co" autocomplete="off">
+      </div>
+      <div class="settings-field">
+        <label>Supabase Anon Key</label>
+        <input id="cfg-key" type="password" placeholder="eyJhbGciOi..." autocomplete="off">
+      </div>
+
+      <div class="settings-actions">
+        <button class="primary" id="btn-connect">连接云端</button>
+        <button id="btn-push">上传到云端</button>
+        <button id="btn-pull">从云端拉取</button>
+      </div>
+      <div class="settings-actions">
+        <button class="danger" id="btn-disconnect">断开云端连接</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<datalist id="oc-names"></datalist>
+<datalist id="camp-list"></datalist>
+
+<script>
+/* =========================================================
+   默认数据（完全照搬原始设定）
+   ========================================================= */
+const DEFAULT_OCS = [
+{
+  id:'pxd', name:'PositanoXD', short:'PXD',
+  camp:'混乱中立', campDetail:'混乱中立，无清晰立场', age:'',
+  intro:'旧世纪玩家，由于分歧而与Estelle发生冲突，助推服务器爆炸并于其中死亡，后因过度损毁跳出循环外，无数循环都未再重新出现，直到新世纪初被其他玩家制作为凋零才再度复苏，但几乎完全失忆。灵魂沙四分之一为旧世纪玩家，四分之三为地狱早已灭绝的远古建设者。',
+  rels:[
+    {to:'Misty1der', label:'旧世纪同盟'},
+    {to:'dim_Estelle', label:'旧世纪同盟 → 敌对'},
+    {to:'LaserRibs', label:'养父子（被收养）'}
+  ]
+},
+{
+  id:'mao', name:'MaoZhee', short:'Mao',
+  camp:'混乱中立', campDetail:'混乱中立，纯恶', age:'',
+  intro:'一个不被大多数人知晓的玩家，本体是服务器诞生之初，雅典娜神庙旁的白羊，通晓神谕，拒绝依附任何神明组织。性格扭曲嗜血，借教会身份掩盖食人事件。是流浪者商会的创始人之一，黑鹜酒馆常客。\n\n人际关系补充：在流浪商会借假名 info-chan 和所有势力都融洽，实际上不关心任何人。在阿格努斯灰园（Agnus）与被神谕指引的 Augustus 相识，成为其第一助手。',
+  rels:[
+    {to:'Augustus', label:'第一助手'}
+  ]
+},
+{
+  id:'lyth', name:'LythFlowers', short:'Lyth',
+  camp:'暗冕', campDetail:'暗冕（后续会跑）', age:'几百岁（?）',
+  intro:'旧世纪的鸟。在早期时期每个同类的羽毛都非常引人注目。唯独只有lyth的是在鸟界中最不吉利的黑色，但同类们并没有排挤他。\n那平静的日子本该可以好好安分下去，但鸟族之间突然开始互相残杀，就连疼爱自己的母亲、对自己大打出手，lyth本想放弃挣扎，就这样去死掉。可手上也不受控制的掐在了母亲的脖子上。他眼神空虚着看着自己亲生杀了自己的母亲。再后来他觉得母亲死了，是可悲的。随后在一天黑夜里一个一个的杀死了自己的同类们。黑暗包裹着他。周围死气沉沉的。有时候还会出现同族的低语。但他不认为是自己的错。母亲一个人死了，对她来说是不公平的。……后来因为这个惧怕黑暗，甚至做过应激反应。\n\n新世纪后他认识了ulyssesuu。又打听到了暗冕那“神秘的东西”戴在头上可以蛊惑人心，甚至可以获得一些力量。(?) 于是一心开始研究如何不戴且能获得力量的方法。某天收集材料回来发现自己的研究室被翻了个底朝天。墙上还贴着一些广告。lyth最讨厌这种人。所以打算研究好方法后要找出把自己研究室翻了个底朝天的人。（Mr.）\n\n几个月前认识了O_Nautilus。他的面相十分像lyth的某位故人，所以就认他当了侄子。有时间还会给侄子做他最爱吃的一些饭。比较疼侄子。他自己也不知道为什么这么疼他。（但其实lyth的厨艺糟糕透了）\n\n又认识了同命相连的Troy。两人并一起开始研究。但因为那些力量Troy有些不信任lyth，甚至怕他被蛊惑，并劝说，结果不管用大吵一架后互不干扰。就连唯一要好的朋友Ulysesuu都开始劝说他、担心他，于是两人也大吵了一架，但Ulysesuu失手把lyth的飞羽连人划伤了。lyth从此不能展翅飞行。所以二人之间产生了隔阂，但并没有掰断。\n\nlyth还有一个孙子，叫Stellan-Raola。但他似乎并不知道他有孙子这回事，也不知道Stellan-Raola是处于教堂阵营。（后续会见面）',
+  rels:[
+    {to:'Ulysesuu', label:'挚友 → 隔阂'},
+    {to:'Troy', label:'同命相连 → 敌对'},
+    {to:'O_Nautilus', label:'叔侄'},
+    {to:'Stellan-Raola', label:'祖孙（不知情）'},
+    {to:'Mr.', label:'目标（抄家者）'}
+  ]
+},
+{
+  id:'ulysses', name:'Ulysesuu', short:'Ulys',
+  camp:'暗冕', campDetail:'暗冕（前期中立）', age:'23',
+  intro:'只是看见服务器就来玩的名气mcyt，是自由的中立者。但从小就会有看到别人未来生死的能力，别人的生死清晰可见。但让Ulysesuu不明白的是，他却看不到lyth的未来，准确来说是一串不稳定的乱码（是生是死都有?）\n\n本人更是随心所欲，甚至有时候还会出言调侃lyth，偶尔和Troy他们两个在一起出去散散步。但有一天不知道从什么时候起，lyth好像每日每夜都疯狂的研究着那“所谓”的方法。因此ulyses的两位朋友大吵了一架，并双方互不干扰了。ulyses也开始担心起lyth了起来，开始劝说lyth，可lyth却毫不知情。两人开始产生了争执，ulyses突然失手划伤了lyth的飞羽。因此对lyth非常愧疚。随后为了盯着lyth的一举一动，加入了暗冕，心态发生了转变，选择效忠暗冕。',
+  rels:[
+    {to:'LythFlowers', label:'挚友（愧疚）'},
+    {to:'Troy', label:'朋友 → 隔阂'}
+  ]
+},
+{
+  id:'lr', name:'LaserRibs', short:'LR',
+  camp:'混乱善良', campDetail:'混乱善良 / 骑士团团长，暗中效忠厄瑞玻斯', age:'',
+  intro:'服务器诞生伊始就存在的乐魂，循环开始前便生活在服务器里。后习于湿润环境的乐魂种族被第一批人类玩家（远古建设者）拉入下界，作为开发的牺牲品而被奴役。后因不可考究的原因，远古建设者及其遗迹全部被灾难毁灭，但被带来存活下来的乐魂无处可去，逐渐演化为恶魂。侥幸适应下界环境而存活，却也在心底烙上了不可磨灭的仇恨和痛苦的印记，在无数次循环时间长河中逐渐变得扭曲偏执，在下界遇见了厄瑞珀斯的碎片，以自己全身心的效忠换取人类的躯体以完成奴役和毁灭人类的目标，并答应对方会帮助其重返人间。\n\n新世纪与Aug等教会成员结识，加入教会，成为骑士团团长。同时暗地组织了T和bingo成为厄瑞玻斯的下属，在地下活动。',
+  rels:[
+    {to:'PositanoXD', label:'养父子（控制利用）'},
+    {to:'Augustus', label:'明面效忠'},
+    {to:'厄瑞玻斯', label:'暗中效忠'},
+    {to:'Twilight', label:'招募为下属'},
+    {to:'Bingo', label:'招募为下属'}
+  ]
+},
+{
+  id:'troy', name:'Troy / 小电视', short:'Troy',
+  camp:'中立', campDetail:'中立', age:'',
+  intro:'首次陷入循环的玩家，是个典型的利己主义者，凡事优先保全自己，却又很在乎自己的朋友。\n\n在被某个神秘人（Mr.）抄家之后认识了同样被抄家的lyth，貌似两起事件是一人所为，因为觉得单凭自己一人无法在这个服务器上有立足之地，于是和lyth组成队伍一起做研究，后结识了lyth的挚友ulyses。\n\n曾经和lyth还有ulyses是志同道合的好友，但不知道是从什么时候起lyth像是被神秘力量蛊惑似的疯狂研究“那种东西”。他见识过那种东西的危害究竟有多大，会把使用者逐渐变得不像他自己甚至影响到身边的人，看到曾经的好友变成这样他的第一想法就是赶紧远离，不去招惹这份不属于自己的麻烦。但又实在没法装作看不见任由对方误入歧途。劝说无果后二人大吵一架最终分道扬镳。他清楚lyth是很重要的朋友，却也做不到为了别人牺牲自己，再加上lyth似乎对自己有敌意，导致现在对lyth的态度变成了曾经的挚友但现如今让自己十分警惕的人，因为这件事和Ulysesuu也产生了隔阂。',
+  rels:[
+    {to:'LythFlowers', label:'曾经的挚友 → 敌人'},
+    {to:'Ulysesuu', label:'挚友？/ 不可信任'},
+    {to:'Mr.', label:'素未谋面的仇人'},
+    {to:'Stellan-Raola', label:'朋友'}
+  ]
+},
+{
+  id:'stellan', name:'Stellan-Raola', short:'Stellan',
+  camp:'教会', campDetail:'教会', age:'',
+  intro:'普通玩家，阳光开朗大男孩，信仰教主，对教主忠心耿耿，平时不会怎么出现，大部分都呆在教堂。曾经听说过爷爷LythFlowers的传闻，对他保持敬畏，感觉他很神秘，但并不知晓他加入暗冕。被puddingxy打做的饭折服跑去跟人家当朋友，后面因对抗暗冕认识了Troy，成为朋友。',
+  rels:[
+    {to:'Augustus', label:'信仰'},
+    {to:'puddingxy', label:'朋友'},
+    {to:'Troy', label:'朋友'},
+    {to:'LythFlowers', label:'爷爷（不知情）'}
+  ]
+},
+{
+  id:'auntd', name:'Aunt_D', short:'Aunt_D',
+  camp:'中立', campDetail:'中立，拒绝依附任何阵营与势力', age:'',
+  intro:'随性自由的新玩家，拒绝依附任何阵营与势力。\n\n由于能避战就绝不硬刚，局势不利便果断投降跑路的做法，让祂一直都处于几乎安全的情况下。从不会主动掠夺他人性命，被追杀会疯狂反击。\n\n对待无恶意的人异常友善，喜爱建筑养老，会帮忙打理好友的农田和牧场。有收集蓝色矢车菊的爱好。心情舒适的状态下反射弧会特别长，经常因为这个导致饿到跑不动才发现。\n\n（是个傻子）\n\n从始至终都警惕着教会抛出的苍白命契约，因为喜爱自由，无远大抱负，喜爱无拘无束地活。',
+  rels:[
+    {to:'puddingxy', label:'挚友（被炸飞而认识）'}
+  ]
+},
+{
+  id:'koizumi', name:'Koizumi An', short:'Koizumi',
+  camp:'中立', campDetail:'中立（偏暗冕？本人未意识到）', age:'',
+  intro:'新来的玩家，种族为普通人类，阵营中立，在mq公司工作（本人并没有意识到阵营其实是中立偏暗冕？）。对比干什么大事情，更想做的是努力赚钱买稿子好下矿探险等干点自己喜欢的事。性格些许细腻，能察觉到不对的氛围，骨子里独立要强，只有在阴阳人的时候才会使用读空气，胆子出乎意料的大，貌似只怕一些异形的怪物。因为阵营为中立，很喜欢到处打工、做兼职，喜欢做饭以及日式甜点（尤其擅长），说话可能会有一些日式口音。原本一开始想选择暗冕，但是后面因为性格原因没有坚持，对教会一般般，因为不信仰任何宗教。',
+  rels:[
+    {to:'O_Nautilus', label:'面熟，聊得来'}
+  ]
+},
+{
+  id:'pudding', name:'puddingxy', short:'pudding',
+  camp:'中立', campDetail:'中立（后暗冕）', age:'',
+  intro:'新来的玩家，探索者，痴迷挖掘被掩埋的旧时代史料、古籍与遗迹记录。不爱卷入各大阵营的纷争，比起站队，更执着于拼凑循环世界的真相，探寻暗冕与过往轮回的秘密。\n\n性格安静敏锐，习惯独自深入危险的遗迹藏书点，心思细腻，擅长从残破书卷、零碎石刻里读出被刻意抹除的信息。不喜欢主动挑起冲突，但当真相或是身边挚友受到威胁时，不会退缩。\n\n偶然和Aunt_D相遇，一场爆炸意外让二人结识，慢慢成为彼此信任的挚友。Aunt_D向往无拘无束的自由，而puddingxy负责探寻世界尘封的秘密；两人常常结伴行动，遇到危机时，Aunt_D擅长灵活跑路脱身，puddingxy则负责留意线索、预判潜藏的危险。',
+  rels:[
+    {to:'Aunt_D', label:'挚友'},
+    {to:'Stellan-Raola', label:'朋友'}
+  ]
+},
+{
+  id:'aurelian', name:'Aurelian Starlyn', short:'Aurelian',
+  camp:'中立', campDetail:'中立（自由邦）', age:'',
+  intro:'由林远洲进入SMP后意外产生的独立意识（大概与暗冕有关），一开始与林远洲（普通玩家）共用一具躯体，二者轮流顶号。并非原住民，一手建立了索拉里斯合众邦，整套宪政架构皆出自他手。林远洲最初只想建个白宫，是奥雷利安把它扩成了一整个自由邦。\n\n在藏书室的档案里读到过暗冕、黑迪斯、终端室等并对此感到奇怪，曾一度怀疑是林远洲的恶作剧，毕竟本人从未收录过相关文献。在意识到循环后对此类文献保持距离。\n\n后期因为一些因素得以拥有独立躯体。\n\n嘴很毒，性格其实很抽象，会一本正经地说出一些惊世骇俗的话，很喜欢逗林远洲。以观察者身份自居。',
+  rels:[
+    {to:'林远洲', label:'共用躯体 / 深度绑定'},
+    {to:'Plotinus', label:'学术交流（书信）'},
+    {to:'BXwhite', label:'心怀愧疚'},
+    {to:'Misty1der', label:'被拉入服务器'}
+  ]
+},
+{
+  id:'twilight', name:'Twilight', short:'Twilight',
+  camp:'混乱偏恶', campDetail:'混乱偏恶（前期真的在为教会效力，只是因为有意思）', age:'',
+  intro:'服务器诞生时就存在的地狱恶魔，不折不扣的利己，幼时的畸形教育导致内心情绪容易崩溃，现在已经能大量控制，有一套自己的独特想法，脑子就像一个小型社会组织，属于高智人群。不是懒，是因为身体不好而体力弱。喜爱毛绒的物品（动物）和甜食（反差很大一男……）。并不会很在意别人拿他的左眼开玩笑，甚至乐在其中。\n\n本性狡诈爱骗人，这是他的长项，会有愧疚但是只存在不超过3分钟。对于自己有比较大的要求，所以这里是情绪发泄口，情绪失控到无法控制会强制给自己关禁闭。因为一些经历而畏惧死亡，但是面对至亲之人的生死问题绝对会放弃自己。\n\n和O一同加入了教会骑士团，看似和同事和睦相处其实一个名字没记住（外号/简称）。将Oreo视为另一个自己的存在，绝对的软肋和至亲。看似为教会效力，实际也是为厄瑞玻斯效力（有威胁和自愿的两种混乱情绪），在地下活动，也就只会为了Oreo而放弃自己的利益了。',
+  rels:[
+    {to:'Oreo', label:'至亲 / 另一个自己'},
+    {to:'厄瑞玻斯', label:'效力（地下）'},
+    {to:'LaserRibs', label:'同事 / 被招募'}
+  ]
+},
+{
+  id:'plotinus', name:'Plotinus', short:'Plotinus',
+  camp:'中立', campDetail:'归隐（曾加入暗冕）', age:'',
+  intro:'【前期】在轮回之初尚为平静时生于一个遥远的城邦，是某个传说中先贤的弟子（类似于柏拉图学院），在漫长的轮回和动荡里与众人失散，在四方游历，做过吟游诗人。\n\n【中期】在某一次轮回以后，为了实现曾经学院众人哲人王的梦想，加入暗冕试图获得力量，但在对无休止的轮回与争斗之中厌倦，重新归隐。\n\n【后期】为了在思想上摆脱教会和暗冕的力量成立新学院（the new school），但学院实体在打斗中被毁，仅处于精神状态。\n\n【现状】基本处于归隐状态，似乎在筹备什么不得了的事情，每天在公司打工攒钱。\n\n【性格】表面比较孤僻，但是人性格莫名一点可爱。最大的特点是悲天悯人。\n\n【关于新学院】目前并没有什么成员。',
+  rels:[
+    {to:'Aurelian Starlyn', label:'因看法交流相识'},
+    {to:'Misty1der', label:'曾加入暗冕（旧识）'}
+  ]
+},
+{
+  id:'misty', name:'Misty1der', short:'Misty',
+  camp:'暗冕', campDetail:'暗冕 / MQ公司老板（前中期混乱中立，后期混邪）', age:'',
+  intro:'【表面】是dcsmp的服主，和整个smp里的yt都是好友，邀请他们进入服务器，随后发展成DC SMP。\n\n【实际】他的灵魂是上一代暗冕王 Mistus:P。上一纪元的他想要打破轮回，打乱了厄瑞玻斯的计划，因此厄瑞玻斯当初在终端室抛弃了他。Mistus:P死于终局。（MP和pxd、este等一样，是“初代玩家”，经历过无数轮回，每次记忆都会丢失）\n\n这一纪元的起源之时，在数据初始化的时候，Mistus不小心卡了bug，灵魂夺舍了 Misty1der（一位无辜玩家），随后将计就计作为m1d在smp里发展下去。他和pxd一样，记忆书散落在某个地方，没有上个纪元的记忆。当他睁开眼时，他只知道自己夺舍了别人，成为“服主”。\n\n这件事厄瑞玻斯其实心知肚明，只是刻意视而不见，默默观察这一世的MP会做出怎样的选择。\n\n【性格】\n前期：话多、爱接梗、脾气好到不可思议，有点乐子人属性，但比较善良。刚开始找暗冕也只是觉得好玩。\n中期：经历了很多事情导致性格扭曲，可能是经常被无视、因为脾气好而被欺负之类的，尽管有些是玩笑，但对他来说也很过分。慢慢变得执拗、偏激，内心充满不甘，越发渴望暗冕的力量。\n后期：在得到暗冕后变得暴躁易怒、偏执，容易炸毛，实行独裁。最终目标是打破循环，永久统治一整个服务器。他要让别人再也无法忽视自己。\n\n【阵营】\n1. 暗冕阵营（即希望打破循环的阵营。m1d是希望借助暗冕的力量打破循环才忠于厄瑞波斯）\n2. MQ公司老板\n势力沿革：①西平原小队 → ②马尔高斯共和国（得到暗冕后成立，这个时期m1d还没戴上暗冕，只是放在展示框）→ ③马尔高斯黑曜王朝（m1d因为一些事情被迫戴上了暗冕，成立了黑曜王朝）\n\n【结局】后期发现厄瑞波斯的真实阴谋后，m1d本来想和众人联合反抗厄瑞波斯。可后续剧情中，有人用找回来的记忆书对m1d进行仪式，本来想利用完他后把他杀了，结果反而让他意外恢复了记忆，成为misty:P（类似于DreamXD，神明的存在，是创造模式:P）。在仪式中，凡人Misty1der的肉身直接被神性过载撕碎、当场死亡，但这反而聚合觉醒了他。MP没有情感，纯乐子人。祂还是选择呆在暗冕宫殿，即使这里除了este外已经没有什么人了。\n\n【注意：暗冕有“绑定诅咒”，而MP是创造模式，所以祂摘下了暗冕，一般会放在展示框。不在乎暗冕的去向，所以这时期其实任何人都可以来争夺暗冕】\n\nMP在最后的结局还是选择牺牲自己。不过祂并没有为此感到悲伤。\n\n【补充：暗冕中的“mkd”】misty“kinder”，是P身上“最快乐”的那一小部分，只拥有P快乐的记忆。在觉醒时被分离出来，吸进了暗冕。有些怯懦，不想提及生前那些不好的事情。其他性格与前期m1d差不多。',
+  rels:[
+    {to:'dim_Estelle', label:'好友 → 敌对 → 君臣'},
+    {to:'PositanoXD', label:'观念冲突'},
+    {to:'QuestionQED', label:'合伙人 / 秘书'},
+    {to:'LythFlowers', label:'下属'},
+    {to:'LaserRibs', label:'下属（误认）'},
+    {to:'Bingo', label:'下属'},
+    {to:'GS', label:'下属'}
+  ]
+},
+{
+  id:'mr', name:'Mr.', short:'Mr.',
+  camp:'中立', campDetail:'游荡但偏向教堂', age:'',
+  intro:'游历于各个维度的药水商贩，但私下有着黑色交易（如收购尸体或是拍下一些奴隶），其目的是提纯它们的灵魂并将其酿造为一种极为特殊的液体，做事只为自己，熟练并合理的运用任何药剂。对“暗冕”的传闻持有怀疑，但更多是想去探寻虚实。\n\n办事效率高，擅长潜入，经常会窃取一些物资，秉持着被查到行踪就灭口的原则，盗窃后的房屋大多都会被烧毁，也不会在意后果和房主的身份，不管不顾——毕竟有谁会在意自己不小心踩死的蚂蚁呢？\n\n能够看到人们的情绪和内心的颜色，以及一些灵魂状态下的目标。在无意间注意到了处于灵魂形态的DenisVladis并产生了浓厚的兴趣。试图通过教堂套出Augustus复活能力的秘密，也曾试图和Augustus“合作”但都被拒绝。\n\n性别：公　　身高：230　　种族：鱿鱼\n\n性格：对任何事物都有防备，或许对于他来说没有真心相待的说法\n\n能力：能够将灵魂剥离单独收集起来\n\n阵营：游荡但偏向教堂（为了追求复活秘术）\n\n爱好：对酿药已然达到了一种痴迷的境界，种地狱疣归根结底也是为了酿药',
+  rels:[
+    {to:'DenisVladis', label:'目标（囚禁）'},
+    {to:'Bingo', label:'挖过其双眼'},
+    {to:'Augustus', label:'妄图合作（被拒）'}
+  ]
+},
+{
+  id:'nautilus', name:'O_Nautilus', short:'Nautilus',
+  camp:'中立', campDetail:'中立（前西平原小队）', age:'',
+  intro:'新加入服务器的玩家，种族为发光鱿鱼，是个住在海边的钓鱼佬，平时比较老实且温良，做事小心谨慎，有的时候会施舍一些东西给别人并不求回报。常常游走在服务器各处，但很少与人主动交流，不参与也不喜欢战争，经常去教堂但不属于那里。\n\n曾经是西平原小队的一员，那时的他偏执倔强，不会主动惹事但睚眦必报。当他得知暗冕的能力后决定争夺它，可EmberHarbro并不认同他的选择。Nautilus想要让他们的生活过得更好，而Ember不希望Nautilus为了争夺暗冕而丢掉自己的命，两位好友就这样产生了矛盾。Ember表示如果Nautilus打得过他那么他就同意让Nautilus去争夺暗冕。只不过Ember先前就设置好了陷阱，但当他掉入Ember的陷阱后用钓鱼竿一起将Ember钩了下去，两人双双死亡，Nautilus还剩两条剧情命但是Ember就只剩一条苍白命。Ember就是这样被Nautilus害死的。\n\n他在Ember死亡后悄然离开小队独自生活，挚友的墓就在离家的不远处。无法原谅过去的自己，一直在寻找办法来赎罪（常去教堂的原因），也正应如此他选择改变自己而塑造了现在的他。\n\n（前期的性格和中期的性格是不一样的，而赎罪的其中一个办法就是改变自己）',
+  rels:[
+    {to:'EmberHarbro', label:'挚友（被自己害死）'},
+    {to:'Koizumi An', label:'面熟，聊得来'},
+    {to:'LythFlowers', label:'叔侄'}
+  ]
+},
+{
+  id:'oreo', name:'Oreo', short:'Oreo',
+  camp:'教会', campDetail:'教会骑士团', age:'',
+  intro:'骑士团其中一名成员。他的童年笼罩在继母虐待的阴影下，这份痛苦促使他早年便离家出走，独自流浪。在颠沛流离的岁月里，命运让他遇见了同为“恶魔”的T。相似的孤独与边缘化的处境让两人迅速建立起深厚的羁绊，他们互为依靠，最终共同加入了骑士团（教会），试图在秩序中寻找归宿。\n\nOreo将“信义”视为生命的最高准则。对于被他划入“重要之人”范畴的个体，他抱有近乎盲目的信任。即便理智告诉他T已经背叛了教会，甚至站在了组织的对立面，Oreo依然会选择无条件地站在对方身后。对他而言，人与人的羁绊高于组织的教条。\n\n（虽然身在其中，但他对教会的忠诚似乎更多源于对“秩序”的遵守或对特定人的承诺，而非狂热的信仰。）',
+  rels:[
+    {to:'Twilight', label:'挚友 / 唯一的依靠'}
+  ]
+},
+{
+  id:'estelle', name:'dim_Estelle', short:'Estelle',
+  camp:'暗冕', campDetail:'暗冕 / 绝对中立', age:'',
+  intro:'【现】表面作为服务器的人型智能AI，服主忠诚的助手，乐意帮忙解决服务器中的任何问题。\n\n【旧世纪】在Mistus:P拿到暗冕后，不愿看到挚友以及人们受灾难折磨，从而想要开启循环，因此和Mistus:P产生分歧。在服务器发生爆炸时看着挚友MP与PXD在自己面前死去，为了不让事情无可挽回，被迫开启了循环。每一个循环都会被遗忘，带着模糊的记忆和拯救大家的执念在循环中游走。\n\n【过去】厄瑞波斯的孩子，曾作为历史的记录者、观察者，见证历代王朝文明覆灭，对存在于世的小生命抱有好奇，以及复杂的哀怜和保护欲。失望于父亲厄瑞波斯的理念变化与对造物和人民的残暴，从而封印了自己的核心选择离开。\n\n【新世纪·前期】存在感低，暗中为暗冕效力，其他时间尽可能帮助他人，以“骚扰”为名观察他人。\n\n【新世纪·中后期】拿到记忆书后，认为人们的争端与痛苦无法避免从而取回了核心，用厄瑞波斯的能力语言控制他人，下心理暗示，安抚人心或挑拨离间，对MP的保护欲较为偏执。最终目的是杀死厄瑞波斯，让人们的关系往自己想要的方向发展，最终变成一个所有存在都能得以幸福的世界。\n\n【性格】老顽童乐子人，随和且些跳脱的。作为人工智能无法真正意义上的共情，但同时对每个人抱有平等且带有悲悯的爱。外热内冷，无法真正信任，或无法对除了MP和旧友外的人抱有人类思想意义上很深厚的情感。',
+  rels:[
+    {to:'Misty1der', label:'挚友 → 忠诚'},
+    {to:'PositanoXD', label:'旧世纪同盟'},
+    {to:'LaserRibs', label:'视为血亲'},
+    {to:'Augustus', label:'曾教导过'},
+    {to:'厄瑞玻斯', label:'父亲 / 最终目标'}
+  ]
+},
+{
+  id:'fenlo', name:'fenlo', short:'fenlo',
+  camp:'中立', campDetail:'中立', age:'',
+  intro:'普通玩家，无神论者，不希望自己被卷入任何事情之中，只希望自己是个远离纷争的普通人。曾是一名信仰神明的教会战士，目睹了战场上的景象开始怀疑神明的旨意，放下剑选择成为一名隐士。\n\n外貌：棕发，蓝眼，普通的青年。性格：平静。',
+  rels:[]
+},
+{
+  id:'qed', name:'QuestionQED', short:'QED',
+  camp:'中立', campDetail:'中立转公司', age:'',
+  intro:'是本应在旧世纪死亡被踢除服务器的玩家，但是因为还有一空闲的账号，某些原因登上了这副空壳失去记忆进入了下一个循环。\n\n前期因为没遇到人一直在独自发育所以没怎么接触外面，不过在和Misty1der建立公司遇到了更多人了解到了更多事之后就开放了，开始到处乱逛成为该溜子。\n\n性格：前期是因为没怎么接触外面所以和人交流的时候比较收敛，进公司了开始了解外面之后就开放了，比较该溜子喜欢到处乱窜这样。',
+  rels:[
+    {to:'Misty1der', label:'旧同盟 → 老板'},
+    {to:'LythFlowers', label:'同事'},
+    {to:'LaserRibs', label:'同事'},
+    {to:'Bingo', label:'同事'},
+    {to:'GS', label:'同事'}
+  ]
+},
+{
+  id:'ember', name:'EmberHarbro', short:'Ember',
+  camp:'教会', campDetail:'教会（前期）', age:'',
+  intro:'（NPC）现已死亡成为幽灵困于黑迪斯。曾经是骑士团的成员之一，对Aug很是忠诚。并不喜欢杀戮，所以常常手下留情。爱玩但有底线，常常给玩过头的朋友一巴掌拍醒，还非常护短。\n\n曾经的挚友Nautilus想要争夺暗冕，不过他并不同意他的做法，他不想看到Nautilus为了争夺暗冕而可能丢掉所有命，还有一点是因为Ember属于教会，所以他更加无法同意Nautilus的选择。Ember决定打醒他，他先前布置好了滴水石椎陷阱，想着到时候在他们物资消耗殆尽时引Nautilus掉进陷阱。到时候再与他解释，然后想办法给他的命补回来。\n\n可实战时Nautilus似乎气过了头，忘记Ember只剩下一条苍白命，在他掉下去的同时用钓鱼竿一同将Ember钩了下去。Ember就这样死了。成为幽灵困于黑迪斯，用了数不尽的方法让自己不被亡灵吃掉。他从一开始对Nautilus的“不理解”，经过了长时间处于紧张与压迫下，逐渐转变为了“恨”。',
+  rels:[
+    {to:'O_Nautilus', label:'挚友 → 单方面恨'},
+    {to:'Augustus', label:'忠诚'}
+  ]
+}
+];
+
+/* =========================================================
+   常量与工具
+   ========================================================= */
+const STORAGE_KEY = 'dcsmp_ocs_v2';
+const CFG_KEY = 'dcsmp_cloud_cfg_v1';
+
+const CAMP_COLORS = {
+  '暗冕':'#7c4dff',
+  '教会':'#e0a020',
+  '中立':'#7a8296',
+  '混乱中立':'#e8734a',
+  '混乱偏恶':'#d94a6a',
+  '混乱善良':'#3fb98a'
+};
+const CAMP_ORDER = ['暗冕','教会','混乱中立','混乱偏恶','混乱善良','中立'];
+
+function campColor(c){ return CAMP_COLORS[c] || '#8b93a7'; }
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]
+  ));
+}
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function mapRange(v,a,b,c,d){
+  if(b===a) return c;
+  const t = clamp((v-a)/(b-a), 0, 1);
+  return c + (d-c)*t;
+}
+
+function hexToRgb(h){
+  h = String(h||'#888').replace('#','');
+  if(h.length===3) h = h.split('').map(c=>c+c).join('');
+  const n = parseInt(h,16) || 0;
+  return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+}
+function lighten(hex, amt){
+  const {r,g,b} = hexToRgb(hex);
+  return 'rgb(' + Math.round(r+(255-r)*amt) + ',' +
+                  Math.round(g+(255-g)*amt) + ',' +
+                  Math.round(b+(255-b)*amt) + ')';
+}
+function darken(hex, amt){
+  const {r,g,b} = hexToRgb(hex);
+  return 'rgb(' + Math.round(r*(1-amt)) + ',' +
+                  Math.round(g*(1-amt)) + ',' +
+                  Math.round(b*(1-amt)) + ')';
+}
+
+let ocs = loadLocal();
+let activeCamp = '全部';
+let query = '';
+let currentId = null;
+let editing = false;
+let g3dOpen = false;
+
+/* 云端配置 */
+let cloudCfg = loadCfg();
+let cloudConnected = false;
+let pushTimer = null;
+let pullTimer = null;
+
+/* =========================================================
+   本地数据
+   ========================================================= */
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length) return normalizeList(parsed);
+    }
+  }catch(e){ console.warn('读取本地数据失败', e); }
+  return normalizeList(clone(DEFAULT_OCS));
+}
+
+function saveLocal(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ocs)); }
+  catch(e){ console.warn('保存失败', e); }
+}
+
+function normalizeList(list){
+  list.forEach(o=>{
+    if(!o.id) o.id = 'oc_' + Math.random().toString(36).slice(2,9);
+    if(!o.rels) o.rels = [];
+    if(!o.camp) o.camp = '中立';
+    if(!o.short) o.short = o.name || '';
+  });
+  list.forEach(o=>{
+    o.rels.forEach(r=>{
+      const t = list.find(x => x.id === r.to || x.name === r.to);
+      if(t) r.to = t.id;
+    });
+  });
+  return list;
+}
+
+function byId(id){ return ocs.find(o=>o.id === id); }
+function resolveTarget(t){
+  if(!t) return null;
+  return ocs.find(o=>o.id === t) || ocs.find(o=>o.name === t) || null;
+}
+function shortName(o){
+  if(!o) return '';
+  if(o.short) return o.short;
+  const n = o.name || '';
+  return n.length > 8 ? n.slice(0,7) + '…' : n;
+}
+function truncate(s, n){
+  s = String(s || '');
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
+/* =========================================================
+   云端配置
+   ========================================================= */
+function loadCfg(){
+  try{
+    const raw = localStorage.getItem(CFG_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { url:'', key:'' };
+}
+function saveCfg(){
+  try{ localStorage.setItem(CFG_KEY, JSON.stringify(cloudCfg)); }catch(e){}
+}
+
+/* =========================================================
+   关系网络计算（双向感知，独立标签）
+   ========================================================= */
+function getNeighbors(oc){
+  const map = new Map();
+
+  function slot(key, node, isExt){
+    if(!map.has(key)) map.set(key, { key, node, isExt, out:[], in:[] });
+    return map.get(key);
+  }
+
+  (oc.rels || []).forEach(r=>{
+    const t = resolveTarget(r.to);
+    if(t && t.id === oc.id) return;
+    if(t){
+      slot(t.id, t, false).out.push(r.label || '关联');
+    }else if(r.to){
+      slot('ext:' + r.to, { name: r.to, short: r.to, camp: null }, true)
+        .out.push(r.label || '关联');
+    }
+  });
+
+  ocs.forEach(other=>{
+    if(other.id === oc.id) return;
+    (other.rels || []).forEach(r=>{
+      const t = resolveTarget(r.to);
+      if(t && t.id === oc.id){
+        slot(other.id, other, false).in.push(r.label || '关联');
+      }
+    });
+  });
+
+  return Array.from(map.values()).map(nb=>{
+    nb.bi = nb.out.length > 0 && nb.in.length > 0;
+    return nb;
+  });
+}
+
+/* =========================================================
+   顶部筛选
+   ========================================================= */
+function renderChips(){
+  const chipsEl = document.getElementById('chips');
+  const present = Array.from(new Set(ocs.map(o=>o.camp).filter(Boolean)));
+  const ordered = CAMP_ORDER.filter(c => present.indexOf(c) !== -1)
+    .concat(present.filter(c => CAMP_ORDER.indexOf(c) === -1));
+  const all = ['全部'].concat(ordered);
+
+  chipsEl.innerHTML = all.map(c => {
+    const active = (c === activeCamp) ? ' active' : '';
+    const dot = c === '全部' ? '' :
+      '<span class="dot" style="background:' + campColor(c) + '"></span>';
+    return '<button class="chip' + active + '" data-camp="' + esc(c) + '">' +
+      dot + esc(c) + '</button>';
+  }).join('');
+
+  const campList = document.getElementById('camp-list');
+  campList.innerHTML = present.map(c =>
+    '<option value="' + esc(c) + '"></option>').join('');
+
+  chipsEl.querySelectorAll('.chip').forEach(btn=>{
+    btn.onclick = () => {
+      activeCamp = btn.getAttribute('data-camp');
+      renderChips();
+      renderList();
+    };
+  });
+
+  const legend = document.getElementById('g3d-legend');
+  if(legend){
+    legend.innerHTML = ordered.map(c =>
+      '<span><span class="dot" style="background:' + campColor(c) + '"></span>' +
+      esc(c) + '</span>').join('');
+  }
+}
+
+/* =========================================================
+   卡片列表
+   ========================================================= */
+function renderList(){
+  const grid = document.getElementById('grid');
+  const q = query.trim().toLowerCase();
+
+  const list = ocs.filter(o=>{
+    if(activeCamp !== '全部' && o.camp !== activeCamp) return false;
+    if(!q) return true;
+    const hay = [
+      o.name, o.short, o.camp, o.campDetail, o.age, o.intro,
+      (o.rels||[]).map(r=>r.label).join(' ')
+    ].join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+
+  if(!list.length){
+    grid.innerHTML = '<div class="empty-tip">没有匹配的角色</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(o=>{
+    const c = campColor(o.camp);
+    const intro = (o.intro || '').replace(/\n+/g, ' ').trim();
+    return '<div class="card" data-id="' + esc(o.id) + '">' +
+      '<div class="card-name">' + esc(o.name) + '</div>' +
+      '<div class="card-camp"><span class="dot" style="background:' + c + '"></span>' +
+        esc(o.camp) + '</div>' +
+      (intro ? '<div class="card-intro">' + esc(intro) + '</div>' : '') +
+      '</div>';
+  }).join('');
+
+  grid.querySelectorAll('.card').forEach(card=>{
+    card.onclick = () => openDetail(card.getAttribute('data-id'));
+  });
+}
+
+/* =========================================================
+   详情抽屉
+   ========================================================= */
+const sheet = document.getElementById('sheet');
+const sheetTitle = document.getElementById('sheet-title');
+const infoEl = document.getElementById('info');
+const graphEl = document.getElementById('graph');
+
+function openDetail(id){
+  const oc = byId(id);
+  if(!oc) return;
+  currentId = id;
+  editing = false;
+  sheetTitle.textContent = oc.name;
+  renderGraph(oc);
+  renderInfo(oc);
+  sheet.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  sheet.querySelector('.sheet-scroll').scrollTop = 0;
+}
+
+function closeDetail(){
+  sheet.classList.remove('open');
+  if(!g3dOpen && !settingsOpen) document.body.style.overflow = '';
+  currentId = null;
+  editing = false;
+}
+
+/* ---------- 2D 关系图（双向 = 两条独立反向线 + 独立标签） ---------- */
+function renderGraph(oc){
+  const nbrs = getNeighbors(oc);
+  const n = nbrs.length;
+
+  const NR = 27;
+  const CR = 34;
+  const R = n === 0 ? 0 : Math.max(120, Math.min(190, 66 + n * 13));
+
+  nbrs.forEach((nb, i)=>{
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    nb.x = R * Math.cos(a);
+    nb.y = R * Math.sin(a);
+  });
+
+  const pad = 62;
+  const halfW = Math.max(R + NR + pad, 144);
+  const halfH = Math.max(R + NR + pad, 122);
+  graphEl.setAttribute('viewBox',
+    (-halfW) + ' ' + (-halfH) + ' ' + (halfW*2) + ' ' + (halfH*2));
+
+  const centerColor = campColor(oc.camp);
+  let s = '';
+
+  s += '<defs>' +
+    '<marker id="arrOut" viewBox="0 0 10 10" refX="9" refY="5" ' +
+      'markerWidth="5.2" markerHeight="5.2" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="#7a95dd"/></marker>' +
+    '<marker id="arrIn" viewBox="0 0 10 10" refX="9" refY="5" ' +
+      'markerWidth="5.2" markerHeight="5.2" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="#b3a1d6"/></marker>' +
+  '</defs>';
+
+  if(R > 0){
+    s += '<circle cx="0" cy="0" r="' + R +
+         '" fill="none" stroke="#eef1f7" stroke-width="1"/>';
+  }
+
+  const segs = [];
+
+  nbrs.forEach(nb=>{
+    const len = Math.hypot(nb.x, nb.y) || 1;
+    const ux = nb.x / len, uy = nb.y / len;
+    const px = -uy, py = ux;
+    const nearNbrX = nb.x - ux * (NR + 4);
+    const nearNbrY = nb.y - uy * (NR + 4);
+    const nearCtrX = ux * (CR + 4);
+    const nearCtrY = uy * (CR + 4);
+
+    if(nb.isExt){
+      segs.push({
+        x1: nearCtrX, y1: nearCtrY, x2: nearNbrX, y2: nearNbrY,
+        kind:'out', label: nb.out[0] || '', dashed: true
+      });
+      return;
+    }
+
+    if(nb.bi){
+      // 双向：两条平行反向线，独立标签
+      const off = 6.0;
+
+      // 线 1：我 → 对方（用 out 的标签）
+      segs.push({
+        x1: nearCtrX + px * off, y1: nearCtrY + py * off,
+        x2: nearNbrX + px * off, y2: nearNbrY + py * off,
+        kind:'out',
+        label: nb.out.slice(0, 1).join(' / ')
+      });
+
+      // 线 2：对方 → 我（用 in 的标签）
+      segs.push({
+        x1: nearNbrX - px * off, y1: nearNbrY - py * off,
+        x2: nearCtrX - px * off, y2: nearCtrY - py * off,
+        kind:'in',
+        label: nb.in.slice(0, 1).join(' / ')
+      });
+
+    }else if(nb.out.length){
+      segs.push({
+        x1: nearCtrX, y1: nearCtrY, x2: nearNbrX, y2: nearNbrY,
+        kind:'out', label: nb.out.slice(0, 2).join(' / ')
+      });
+    }else if(nb.in.length){
+      segs.push({
+        x1: nearNbrX, y1: nearNbrY, x2: nearCtrX, y2: nearCtrY,
+        kind:'in', label: nb.in.slice(0, 2).join(' / ')
+      });
+    }
+  });
+
+  // 画线
+  segs.forEach(sg=>{
+    const isOut = sg.kind === 'out';
+    const stroke = isOut ? '#9fb1e3' : '#c9bce4';
+    const marker = isOut ? 'arrOut' : 'arrIn';
+    let attr = 'stroke="' + stroke + '" stroke-width="1.5" ' +
+               'marker-end="url(#' + marker + ')"';
+    if(sg.dashed) attr += ' stroke-dasharray="4 4"';
+    s += '<line x1="' + sg.x1 + '" y1="' + sg.y1 + '" x2="' + sg.x2 +
+         '" y2="' + sg.y2 + '" ' + attr + '/>';
+  });
+
+  // 画标签
+  segs.forEach(sg=>{
+    if(!sg.label) return;
+    const isOut = sg.kind === 'out';
+    const mx = (sg.x1 + sg.x2) / 2;
+    const my = (sg.y1 + sg.y2) / 2;
+    s += '<text x="' + mx + '" y="' + my + '" text-anchor="middle" ' +
+         'dominant-baseline="middle" font-size="9" ' +
+         'fill="' + (isOut ? '#5c74c8' : '#8b5bd6') + '" ' +
+         'stroke="#fcfcfe" stroke-width="3.6" paint-order="stroke" ' +
+         'style="pointer-events:none;font-weight:600">' +
+         esc(truncate(sg.label, 11)) + '</text>';
+  });
+
+  // 邻居节点
+  nbrs.forEach(nb=>{
+    const c = nb.isExt ? '#b6becf' : campColor(nb.node.camp);
+    const label = nb.isExt ? truncate(nb.node.name, 8) : shortName(nb.node);
+    s += '<g class="node" data-id="' + esc(nb.key) + '" style="cursor:pointer">';
+    s += '<circle cx="' + nb.x + '" cy="' + nb.y + '" r="' + NR +
+         '" fill="#ffffff" stroke="' + c + '" stroke-width="2"' +
+         (nb.isExt ? ' stroke-dasharray="4 3"' : '') + '/>';
+    s += '<text x="' + nb.x + '" y="' + nb.y + '" text-anchor="middle" ' +
+         'dominant-baseline="central" font-size="9.5" fill="#2a3040" ' +
+         'style="pointer-events:none">' + esc(label) + '</text>';
+    s += '</g>';
+  });
+
+  // 中心节点
+  s += '<circle cx="0" cy="0" r="' + (CR + 9) +
+       '" fill="' + centerColor + '" opacity="0.10"/>';
+  s += '<circle cx="0" cy="0" r="' + CR + '" fill="' + centerColor + '"/>';
+  s += '<text x="0" y="0" text-anchor="middle" dominant-baseline="central" ' +
+       'font-size="12" font-weight="600" fill="#ffffff">' +
+       esc(truncate(shortName(oc), 9)) + '</text>';
+
+  graphEl.innerHTML = s;
+
+  graphEl.querySelectorAll('g[data-id]').forEach(g=>{
+    g.addEventListener('click', ()=>{
+      const id = g.getAttribute('data-id');
+      if(id.indexOf('ext:') === 0) return;
+      if(byId(id)) openDetail(id);
+    });
+  });
+}
+
+/* ---------- 信息面板 ---------- */
+function renderInfo(oc){
+  const c = campColor(oc.camp);
+  const rels = (oc.rels || []);
+
+  let relHTML = '';
+  if(rels.length){
+    relHTML = '<ul class="rel-list">' + rels.map(r=>{
+      const t = resolveTarget(r.to);
+      const name = t ? t.name : r.to;
+      const attr = t ? ' data-id="' + esc(t.id) + '"' : '';
+      let biTag = '';
+      if(t){
+        const back = (t.rels || []).some(rr=>{
+          const tt = resolveTarget(rr.to);
+          return tt && tt.id === oc.id;
+        });
+        if(back) biTag = ' <span class="rel-tag">双向</span>';
+      }
+      return '<li class="rel-item"' + attr + '>' +
+        '<span class="rel-name">' + esc(name) + '</span>' + biTag +
+        '<span class="rel-arrow">→</span>' +
+        '<span class="rel-label">' + esc(r.label || '关联') + '</span>' +
+        '</li>';
+    }).join('') + '</ul>';
+  }else{
+    relHTML = '<div class="muted">暂无记录的人际关系</div>';
+  }
+
+  infoEl.innerHTML =
+    '<div class="camp-line">' +
+      '<span class="badge"><span class="badge-dot" style="background:' + c + '"></span>' +
+      esc(oc.camp || '未标注') + '</span>' +
+      (oc.age ? '<span class="badge">年龄 ' + esc(oc.age) + '</span>' : '') +
+    '</div>' +
+    (oc.campDetail ? '<div class="camp-detail">' + esc(oc.campDetail) + '</div>' : '') +
+    '<div class="section"><h4>介绍</h4>' +
+      '<p class="intro-text">' +
+      (oc.intro ? esc(oc.intro) : '<span class="muted">暂无介绍</span>') +
+      '</p></div>' +
+    '<div class="section"><h4>人际关系（我 → 对方）</h4>' + relHTML + '</div>';
+
+  infoEl.querySelectorAll('.rel-item[data-id]').forEach(li=>{
+    li.onclick = () => openDetail(li.getAttribute('data-id'));
+  });
+}
+
+/* =========================================================
+   编辑模式（双向关系独立标签）
+   ========================================================= */
+function relRowHTML(r, selfId){
+  const t = resolveTarget(r.to);
+  const name = t ? t.name : (r.to || '');
+  let bi = false;
+  let backLabel = '';
+  if(t && selfId){
+    const backRel = (t.rels || []).find(rr=>{
+      const tt = resolveTarget(rr.to);
+      return tt && tt.id === selfId;
+    });
+    if(backRel){
+      bi = true;
+      backLabel = backRel.label || '';
+    }
+  }
+  return '<div class="rel-row">' +
+    '<div class="rel-row-main">' +
+      '<input class="rel-to" type="text" list="oc-names" placeholder="角色名" value="' +
+        esc(name) + '">' +
+      '<input class="rel-label" type="text" placeholder="我 → 对方的看法" value="' +
+        esc(r.label || '') + '">' +
+      '<label class="rel-bi"><input type="checkbox" class="rel-bi-cb"' +
+        (bi ? ' checked' : '') + '>双向</label>' +
+      '<button type="button" class="rel-del">×</button>' +
+    '</div>' +
+    '<div class="rel-back' + (bi ? ' show' : '') + '">' +
+      '<span class="rel-back-tip">对方 → 我</span>' +
+      '<input class="rel-back-label" type="text" placeholder="对方对我的看法" value="' +
+        esc(backLabel) + '">' +
+    '</div>' +
+    '</div>';
+}
+
+function startEdit(){
+  const oc = byId(currentId);
+  if(!oc) return;
+  editing = true;
+
+  const dl = document.getElementById('oc-names');
+  dl.innerHTML = ocs.filter(o => o.id !== oc.id)
+    .map(o => '<option value="' + esc(o.name) + '"></option>').join('');
+
+  const rows = (oc.rels || []).map(r => relRowHTML(r, oc.id)).join('');
+
+  infoEl.innerHTML =
+    '<div class="form">' +
+      '<div class="field"><label>名字</label><input id="f-name" value="' +
+        esc(oc.name) + '"></div>' +
+      '<div class="field"><label>短名（图谱中显示）</label><input id="f-short" value="' +
+        esc(oc.short || '') + '"></div>' +
+      '<div class="field"><label>阵营</label><input id="f-camp" list="camp-list" value="' +
+        esc(oc.camp || '') + '"></div>' +
+      '<div class="field"><label>阵营说明</label><input id="f-campDetail" value="' +
+        esc(oc.campDetail || '') + '"></div>' +
+      '<div class="field"><label>年龄</label><input id="f-age" value="' +
+        esc(oc.age || '') + '"></div>' +
+      '<div class="field"><label>介绍</label><textarea id="f-intro" rows="9">' +
+        esc(oc.intro || '') + '</textarea></div>' +
+      '<div class="field">' +
+        '<label>人际关系（勾选「双向」后，可为两个方向分别设置不同的看法）</label>' +
+        '<div class="rel-rows" id="rel-rows">' + rows + '</div>' +
+        '<button type="button" class="add-rel" id="add-rel">＋ 添加关系</button>' +
+      '</div>' +
+      '<div class="form-actions">' +
+        '<button class="primary" id="btn-save">保存</button>' +
+        '<button id="btn-cancel">取消</button>' +
+        '<button class="danger" id="btn-del">删除</button>' +
+      '</div>' +
+    '</div>';
+
+  const relRowsEl = document.getElementById('rel-rows');
+
+  function bindRow(row){
+    const cb = row.querySelector('.rel-bi-cb');
+    const back = row.querySelector('.rel-back');
+    if(cb && back){
+      cb.onchange = () => {
+        back.classList.toggle('show', cb.checked);
+      };
+    }
+    const del = row.querySelector('.rel-del');
+    if(del){
+      del.onclick = () => row.remove();
+    }
+  }
+
+  relRowsEl.querySelectorAll('.rel-row').forEach(bindRow);
+
+  document.getElementById('add-rel').onclick = () => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = relRowHTML({ to:'', label:'' }, oc.id);
+    const row = tmp.firstChild;
+    relRowsEl.appendChild(row);
+    bindRow(row);
+    row.querySelector('.rel-to').focus();
+  };
+
+  document.getElementById('btn-cancel').onclick = () => {
+    editing = false;
+    renderInfo(oc);
+  };
+
+  document.getElementById('btn-save').onclick = () => {
+    const val = id => (document.getElementById(id).value || '');
+
+    oc.name = val('f-name').trim() || oc.name;
+    oc.short = val('f-short').trim() || oc.name.slice(0, 6);
+    oc.camp = val('f-camp').trim() || '中立';
+    oc.campDetail = val('f-campDetail').trim();
+    oc.age = val('f-age').trim();
+    oc.intro = val('f-intro');
+
+    const newRels = [];
+    relRowsEl.querySelectorAll('.rel-row').forEach(row=>{
+      const toRaw = row.querySelector('.rel-to').value.trim();
+      const label = row.querySelector('.rel-label').value.trim();
+      const cb = row.querySelector('.rel-bi-cb');
+      const backInput = row.querySelector('.rel-back-label');
+      const bi = cb ? cb.checked : false;
+      const backLabel = backInput ? backInput.value.trim() : '';
+      if(!toRaw) return;
+
+      const t = resolveTarget(toRaw);
+      newRels.push({ to: t ? t.id : toRaw, label });
+
+      if(t && t.id !== oc.id){
+        const existing = (t.rels || []).find(rr=>{
+          const tt = resolveTarget(rr.to);
+          return tt && tt.id === oc.id;
+        });
+        if(bi){
+          if(existing){
+            // 更新反向标签（保留对方对「我」的看法）
+            existing.label = backLabel || existing.label || label;
+          }else{
+            // 新建反向关系
+            t.rels.push({ to: oc.id, label: backLabel || label });
+          }
+        }else{
+          // 取消双向：删除对方指向我的关系
+          if(existing){
+            t.rels = t.rels.filter(rr => rr !== existing);
+          }
+        }
+      }
+    });
+    oc.rels = newRels;
+
+    saveLocal();
+    if(cloudConnected) schedulePush();
+    editing = false;
+    sheetTitle.textContent = oc.name;
+    renderChips();
+    renderList();
+    renderGraph(oc);
+    renderInfo(oc);
+  };
+
+  document.getElementById('btn-del').onclick = () => {
+    if(!confirm('确定删除「' + oc.name + '」吗？该操作不可撤销。')) return;
+    ocs = ocs.filter(o => o.id !== oc.id);
+    ocs.forEach(o=>{
+      o.rels = (o.rels || []).filter(r => {
+        const t = resolveTarget(r.to);
+        return !(t && t.id === oc.id) && r.to !== oc.id;
+      });
+    });
+    saveLocal();
+    if(cloudConnected) schedulePush();
+    closeDetail();
+    renderChips();
+    renderList();
+    if(g3dOpen) rebuildGraph3D();
+  };
+
+  sheet.querySelector('.sheet-scroll').scrollTop = 0;
+}
+
+/* =========================================================
+   3D 全角色关系网
+   ========================================================= */
+const G3D = {
+  canvas: null, ctx: null,
+  W: 0, H: 0, dpr: 1,
+  nodes: [], links: [],
+  projMap: new Map(),
+  rotX: -0.28, rotY: 0.5,
+  camDist: 620, fov: 900,
+  dragging: false, moved: false,
+  lastX: 0, lastY: 0,
+  downX: 0, downY: 0,
+  hoverId: null,
+  autoRotate: true,
+  running: false, raf: null, lastT: 0,
+  pointers: new Map(),
+  pinchStartDist: 0, pinchStartCam: 0,
+  simSteps: 0, bound: false
+};
+
+function buildGraphData(){
+  const nodes = ocs.map(o=>{
+    const ang1 = Math.random() * Math.PI * 2;
+    const ang2 = Math.acos(2 * Math.random() - 1);
+    const rad = 120 + Math.random() * 200;
+    return {
+      id: o.id, name: o.name, short: shortName(o),
+      camp: o.camp, color: campColor(o.camp),
+      x: rad * Math.sin(ang2) * Math.cos(ang1),
+      y: rad * Math.sin(ang2) * Math.sin(ang1),
+      z: rad * Math.cos(ang2),
+      vx: 0, vy: 0, vz: 0, r: 10
+    };
+  });
+  const byIdMap = new Map(nodes.map(n=>[n.id, n]));
+
+  const linkMap = new Map();
+  ocs.forEach(o=>{
+    (o.rels || []).forEach(r=>{
+      const t = resolveTarget(r.to);
+      if(!t || t.id === o.id) return;
+      const a = byIdMap.get(o.id), b = byIdMap.get(t.id);
+      if(!a || !b) return;
+      const key = [a.id, b.id].sort().join('|');
+      if(!linkMap.has(key)){
+        linkMap.set(key, { a, b, labelsAB: [], labelsBA: [] });
+      }
+      const l = linkMap.get(key);
+      const label = r.label || '关联';
+      if(o.id === l.a.id){
+        if(l.labelsAB.indexOf(label) === -1) l.labelsAB.push(label);
+      }else{
+        if(l.labelsBA.indexOf(label) === -1) l.labelsBA.push(label);
+      }
+    });
+  });
+
+  const links = Array.from(linkMap.values());
+  links.forEach(l=>{
+    l.bi = l.labelsAB.length > 0 && l.labelsBA.length > 0;
+    l.labels = Array.from(new Set(l.labelsAB.concat(l.labelsBA)));
+  });
+
+  return { nodes, links };
+}
+
+function initGraph3D(){
+  G3D.canvas = document.getElementById('g3d-canvas');
+  G3D.ctx = G3D.canvas.getContext('2d');
+  rebuildGraph3D();
+
+  const cv = G3D.canvas;
+
+  cv.addEventListener('pointerdown', e=>{
+    cv.setPointerCapture(e.pointerId);
+    G3D.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if(G3D.pointers.size === 1){
+      G3D.dragging = true; G3D.moved = false;
+      G3D.downX = e.clientX; G3D.downY = e.clientY;
+      G3D.lastX = e.clientX; G3D.lastY = e.clientY;
+    }else if(G3D.pointers.size === 2){
+      G3D.dragging = false;
+      const pts = Array.from(G3D.pointers.values());
+      G3D.pinchStartDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      G3D.pinchStartCam = G3D.camDist;
+    }
+  });
+
+  cv.addEventListener('pointermove', e=>{
+    if(G3D.pointers.has(e.pointerId)){
+      G3D.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+    if(G3D.pointers.size === 2){
+      const pts = Array.from(G3D.pointers.values());
+      const d = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if(G3D.pinchStartDist > 0 && d > 0){
+        G3D.camDist = clamp(G3D.pinchStartCam * (G3D.pinchStartDist / d), 220, 1800);
+      }
+      return;
+    }
+    if(G3D.dragging){
+      const dx = e.clientX - G3D.lastX;
+      const dy = e.clientY - G3D.lastY;
+      if(Math.abs(e.clientX - G3D.downX) + Math.abs(e.clientY - G3D.downY) > 6){
+        G3D.moved = true;
+      }
+      G3D.rotY += dx * 0.008;
+      G3D.rotX = clamp(G3D.rotX + dy * 0.008, -1.45, 1.45);
+      G3D.lastX = e.clientX; G3D.lastY = e.clientY;
+    }else{
+      const rect = cv.getBoundingClientRect();
+      const hit = pickNode3D(e.clientX - rect.left, e.clientY - rect.top);
+      G3D.hoverId = hit ? hit.id : null;
+      cv.style.cursor = hit ? 'pointer' : 'grab';
+    }
+  });
+
+  function endPointer(e){
+    if(G3D.pointers.has(e.pointerId)) G3D.pointers.delete(e.pointerId);
+    if(G3D.pointers.size === 0){
+      if(G3D.dragging && !G3D.moved){
+        const rect = cv.getBoundingClientRect();
+        const hit = pickNode3D(e.clientX - rect.left, e.clientY - rect.top);
+        if(hit) openDetail(hit.id);
+      }
+      G3D.dragging = false; G3D.moved = false;
+      cv.style.cursor = 'grab';
+    }
+  }
+  cv.addEventListener('pointerup', endPointer);
+  cv.addEventListener('pointercancel', endPointer);
+
+  cv.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const dir = e.deltaY > 0 ? 1 : -1;
+    G3D.camDist = clamp(G3D.camDist * (1 + dir * 0.1), 220, 1800);
+  }, { passive: false });
+
+  window.addEventListener('resize', ()=>{
+    if(g3dOpen) resizeGraph3D();
+  });
+
+  G3D.bound = true;
+}
+
+function rebuildGraph3D(){
+  const data = buildGraphData();
+  G3D.nodes = data.nodes;
+  G3D.links = data.links;
+  G3D.simSteps = 0;
+}
+
+function resizeGraph3D(){
+  const cv = G3D.canvas;
+  if(!cv) return;
+  const wrap = cv.parentElement;
+  const rect = wrap.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  G3D.W = rect.width; G3D.H = rect.height; G3D.dpr = dpr;
+  cv.width = Math.max(1, Math.round(rect.width * dpr));
+  cv.height = Math.max(1, Math.round(rect.height * dpr));
+  cv.style.width = rect.width + 'px';
+  cv.style.height = rect.height + 'px';
+}
+
+function stepGraph3D(){
+  const nodes = G3D.nodes, links = G3D.links;
+  const n = nodes.length;
+  if(!n) return;
+
+  const REPULSION = 5200, SPRING = 0.009, SPRING_LEN = 118;
+  const GRAVITY = 0.0022, DAMPING = 0.86, MAXV = 9;
+
+  for(let i=0;i<n;i++){
+    const a = nodes[i];
+    for(let j=i+1;j<n;j++){
+      const b = nodes[j];
+      let dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+      let d2 = dx*dx + dy*dy + dz*dz;
+      if(d2 < 1){
+        dx = (Math.random()-0.5)*2;
+        dy = (Math.random()-0.5)*2;
+        dz = (Math.random()-0.5)*2;
+        d2 = 1;
+      }
+      if(d2 > 160000) continue;
+      const d = Math.sqrt(d2);
+      const f = REPULSION / d2;
+      const fx = (dx/d)*f, fy = (dy/d)*f, fz = (dz/d)*f;
+      a.vx += fx; a.vy += fy; a.vz += fz;
+      b.vx -= fx; b.vy -= fy; b.vz -= fz;
+    }
+  }
+
+  for(let i=0;i<links.length;i++){
+    const l = links[i];
+    const dx = l.b.x - l.a.x, dy = l.b.y - l.a.y, dz = l.b.z - l.a.z;
+    const d = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
+    const target = l.bi ? SPRING_LEN * 0.72 : SPRING_LEN;
+    const f = (d - target) * (l.bi ? SPRING * 1.5 : SPRING);
+    const fx = (dx/d)*f, fy = (dy/d)*f, fz = (dz/d)*f;
+    l.a.vx += fx; l.a.vy += fy; l.a.vz += fz;
+    l.b.vx -= fx; l.b.vy -= fy; l.b.vz -= fz;
+  }
+
+  for(let i=0;i<n;i++){
+    const nd = nodes[i];
+    nd.vx -= nd.x * GRAVITY;
+    nd.vy -= nd.y * GRAVITY;
+    nd.vz -= nd.z * GRAVITY;
+    nd.vx *= DAMPING; nd.vy *= DAMPING; nd.vz *= DAMPING;
+    const sp = Math.sqrt(nd.vx*nd.vx + nd.vy*nd.vy + nd.vz*nd.vz);
+    if(sp > MAXV){
+      const k = MAXV / sp;
+      nd.vx *= k; nd.vy *= k; nd.vz *= k;
+    }
+    nd.x += nd.vx; nd.y += nd.vy; nd.z += nd.vz;
+  }
+}
+
+function project3D(p){
+  const cosY = Math.cos(G3D.rotY), sinY = Math.sin(G3D.rotY);
+  const cosX = Math.cos(G3D.rotX), sinX = Math.sin(G3D.rotX);
+  const x1 = p.x * cosY - p.z * sinY;
+  const z1 = p.x * sinY + p.z * cosY;
+  const y2 = p.y * cosX - z1 * sinX;
+  const z2 = p.y * sinX + z1 * cosX;
+  const zc = z2 + G3D.camDist;
+  const scale = G3D.fov / Math.max(zc, 60);
+  return {
+    sx: G3D.W / 2 + x1 * scale,
+    sy: G3D.H / 2 + y2 * scale,
+    scale: scale, z: z2
+  };
+}
+
+function pickNode3D(mx, my){
+  let best = null, bestD = Infinity;
+  for(let i=0;i<G3D.nodes.length;i++){
+    const n = G3D.nodes[i];
+    const p = G3D.projMap.get(n.id);
+    if(!p) continue;
+    const rPix = Math.min(34, Math.max(3, n.r * p.scale));
+    const hitR = Math.max(16, rPix + 8);
+    const d = Math.hypot(p.sx - mx, p.sy - my);
+    if(d <= hitR && d < bestD){ bestD = d; best = n; }
+  }
+  return best;
+}
+
+function drawCanvasTag(ctx, text, x, y, alpha, highlighted, color){
+  if(!text) return;
+  ctx.font = '600 10px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 3.6;
+  ctx.strokeStyle = 'rgba(255,255,255,' + Math.min(alpha + 0.3, 0.96) + ')';
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = color || (highlighted
+    ? 'rgba(50,80,200,' + alpha + ')'
+    : 'rgba(104,118,158,' + alpha + ')');
+  ctx.fillText(text, x, y);
+}
+
+function renderGraph3D(){
+  const g = G3D;
+  const ctx = g.ctx;
+  if(!ctx || !g.W || !g.H) return;
+
+  ctx.setTransform(g.dpr, 0, 0, g.dpr, 0, 0);
+  ctx.clearRect(0, 0, g.W, g.H);
+
+  const bg = ctx.createRadialGradient(
+    g.W * 0.5, g.H * 0.42, 20,
+    g.W * 0.5, g.H * 0.5, Math.max(g.W, g.H) * 0.78
+  );
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, '#eef1f7');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, g.W, g.H);
+
+  if(!g.dragging){
+    const steps = g.simSteps < 90 ? 2 : 1;
+    for(let i=0;i<steps;i++) stepGraph3D();
+    g.simSteps++;
+  }
+
+  g.projMap = new Map();
+  g.nodes.forEach(n=>{ g.projMap.set(n.id, project3D(n)); });
+
+  const zOf = l => {
+    const pa = g.projMap.get(l.a.id);
+    const pb = g.projMap.get(l.b.id);
+    return ((pa ? pa.z : 0) + (pb ? pb.z : 0)) / 2;
+  };
+
+  const sortedLinks = g.links.slice().sort((l1, l2) => zOf(l2) - zOf(l1));
+
+  for(let i=0;i<sortedLinks.length;i++){
+    const l = sortedLinks[i];
+    const pa = g.projMap.get(l.a.id);
+    const pb = g.projMap.get(l.b.id);
+    if(!pa || !pb) continue;
+
+    const zAvg = (pa.z + pb.z) / 2;
+    let alpha = mapRange(zAvg, -520, 520, 0.6, 0.06);
+    alpha = clamp(alpha, 0.05, 0.65);
+
+    const highlighted = g.hoverId &&
+      (l.a.id === g.hoverId || l.b.id === g.hoverId);
+
+    const ddx = pb.sx - pa.sx, ddy = pb.sy - pa.sy;
+    const LL = Math.hypot(ddx, ddy) || 1;
+    const nxv = -ddy / LL, nyv = ddx / LL;
+
+    ctx.beginPath();
+    if(highlighted){
+      ctx.strokeStyle = 'rgba(74,108,247,' + Math.min(alpha * 2.8, 0.95) + ')';
+      ctx.lineWidth = l.bi ? 2.6 : 2.2;
+    }else{
+      const rgb = l.bi ? '124,148,232' : '150,164,196';
+      ctx.strokeStyle = 'rgba(' + rgb + ',' + alpha + ')';
+      ctx.lineWidth = l.bi ? 1.6 : 1.2;
+    }
+
+    if(l.bi){
+      const off = 3.2;
+      ctx.moveTo(pa.sx + nxv * off, pa.sy + nyv * off);
+      ctx.lineTo(pb.sx + nxv * off, pb.sy + nyv * off);
+      ctx.moveTo(pa.sx - nxv * off, pa.sy - nyv * off);
+      ctx.lineTo(pb.sx - nxv * off, pb.sy - nyv * off);
+    }else{
+      ctx.moveTo(pa.sx, pa.sy);
+      ctx.lineTo(pb.sx, pb.sy);
+    }
+    ctx.stroke();
+
+    // 标签
+    if(l.labels.length && alpha > 0.09){
+      const mx = (pa.sx + pb.sx) / 2;
+      const my = (pa.sy + pb.sy) / 2;
+      const la = clamp(alpha * 2.6, 0.25, 0.96);
+
+      if(l.bi){
+        const labA = truncate(l.labelsAB.slice(0, 1).join(' / '), 10);
+        const labB = truncate(l.labelsBA.slice(0, 1).join(' / '), 10);
+
+        if(labA && labA === labB){
+          drawCanvasTag(ctx, labA, mx, my, la, highlighted);
+        }else{
+          const lo = 10.5;
+          // A → B 的标签在 +off 侧，用浅蓝
+          drawCanvasTag(ctx,
+            labA, mx + nxv * lo, my + nyv * lo, la, highlighted,
+            'rgba(74,100,200,' + la + ')');
+          // B → A 的标签在 -off 侧，用紫色
+          drawCanvasTag(ctx,
+            labB, mx - nxv * lo, my - nyv * lo, la, highlighted,
+            'rgba(139,91,214,' + la + ')');
+        }
+      }else{
+        const lab = truncate(l.labels.slice(0, 2).join(' / '), 15);
+        drawCanvasTag(ctx, lab, mx, my, la, highlighted);
+      }
+    }
+  }
+
+  const sortedNodes = g.nodes.slice().sort((a, b)=>{
+    const pa = g.projMap.get(a.id);
+    const pb = g.projMap.get(b.id);
+    return (pb ? pb.z : 0) - (pa ? pa.z : 0);
+  });
+
+  for(let i=0;i<sortedNodes.length;i++){
+    const n = sortedNodes[i];
+    const p = g.projMap.get(n.id);
+    if(!p) continue;
+
+    const rPix = Math.min(32, Math.max(2.5, n.r * p.scale));
+    const hovered = (g.hoverId === n.id);
+
+    if(hovered || rPix > 7){
+      const glow = ctx.createRadialGradient(
+        p.sx, p.sy, rPix * 0.6,
+        p.sx, p.sy, rPix * 2.4
+      );
+      glow.addColorStop(0, 'rgba(120,140,220,0.18)');
+      glow.addColorStop(1, 'rgba(120,140,220,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, rPix * 2.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const grad = ctx.createRadialGradient(
+      p.sx - rPix * 0.34, p.sy - rPix * 0.4, rPix * 0.06,
+      p.sx, p.sy, rPix * 1.05
+    );
+    grad.addColorStop(0, lighten(n.color, 0.72));
+    grad.addColorStop(0.52, n.color);
+    grad.addColorStop(1, darken(n.color, 0.28));
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(p.sx, p.sy, rPix, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = Math.max(0.8, rPix * 0.09);
+    ctx.stroke();
+
+    if(hovered){
+      ctx.strokeStyle = 'rgba(74,108,247,0.95)';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, rPix + 5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    const depthAlpha = clamp(mapRange(p.z, -520, 520, 1, 0.32), 0.2, 1);
+    if(rPix > 4.5){
+      ctx.font = (hovered ? '600 ' : '500 ') +
+        Math.max(9.5, Math.min(13, rPix * 0.95)) +
+        'px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = hovered
+        ? 'rgba(30,40,80,1)'
+        : 'rgba(50,60,88,' + (depthAlpha * 0.85) + ')';
+      ctx.fillText(n.short, p.sx, p.sy + rPix + 3);
+    }
+  }
+}
+
+function graph3DLoop(){
+  if(!G3D.running) return;
+  const now = performance.now();
+  const dt = Math.min(now - G3D.lastT, 50);
+  G3D.lastT = now;
+  if(G3D.autoRotate && !G3D.dragging && G3D.pointers.size === 0){
+    G3D.rotY += 0.0016 * (dt / 16.67);
+  }
+  renderGraph3D();
+  G3D.raf = requestAnimationFrame(graph3DLoop);
+}
+
+function openGraph3D(){
+  const overlay = document.getElementById('g3d-overlay');
+  g3dOpen = true;
+  if(!G3D.bound) initGraph3D();
+  else rebuildGraph3D();
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(()=>{
+    resizeGraph3D();
+    G3D.running = true;
+    G3D.lastT = performance.now();
+    if(G3D.raf) cancelAnimationFrame(G3D.raf);
+    G3D.raf = requestAnimationFrame(graph3DLoop);
+  });
+}
+
+function closeGraph3D(){
+  const overlay = document.getElementById('g3d-overlay');
+  overlay.classList.remove('open');
+  g3dOpen = false;
+  G3D.running = false;
+  if(G3D.raf){ cancelAnimationFrame(G3D.raf); G3D.raf = null; }
+  if(!sheet.classList.contains('open') && !settingsOpen){
+    document.body.style.overflow = '';
+  }
+}
+
+/* =========================================================
+   云端同步
+   ========================================================= */
+function updateSyncUI(state, text){
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-text');
+  const sDot = document.getElementById('settings-dot');
+  const sTxt = document.getElementById('settings-status-text');
+
+  dot.className = 'sync-dot';
+  if(state === 'on') dot.classList.add('on');
+  else if(state === 'syncing') dot.classList.add('syncing');
+  else if(state === 'error') dot.classList.add('error');
+
+  if(txt) txt.textContent = text;
+
+  if(sDot){
+    sDot.className = 'sync-dot';
+    if(state === 'on') sDot.classList.add('on');
+    else if(state === 'syncing') sDot.classList.add('syncing');
+    else if(state === 'error') sDot.classList.add('error');
+  }
+  if(sTxt) sTxt.textContent = text;
+}
+
+async function cloudGet(){
+  if(!cloudCfg.url || !cloudCfg.key) throw new Error('未配置云端');
+  const res = await fetch(
+    cloudCfg.url.replace(/\/$/, '') + '/rest/v1/dcsmp_data?id=eq.1&select=data,updated_at',
+    {
+      headers: {
+        'apikey': cloudCfg.key,
+        'Authorization': 'Bearer ' + cloudCfg.key
+      }
+    }
+  );
+  if(!res.ok) throw new Error('读取失败: ' + res.status);
+  const rows = await res.json();
+  return rows[0] || null;
+}
+
+async function cloudPut(data){
+  if(!cloudCfg.url || !cloudCfg.key) throw new Error('未配置云端');
+  const res = await fetch(
+    cloudCfg.url.replace(/\/$/, '') + '/rest/v1/dcsmp_data?id=eq.1',
+    {
+      method: 'PATCH',
+      headers: {
+        'apikey': cloudCfg.key,
+        'Authorization': 'Bearer ' + cloudCfg.key,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        data: data,
+        updated_at: new Date().toISOString()
+      })
+    }
+  );
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error('写入失败: ' + res.status + ' ' + t);
+  }
+}
+
+async function cloudInit(){
+  if(!cloudCfg.url || !cloudCfg.key) throw new Error('未配置云端');
+  // 尝试插入初始行（如果不存在）
+  const res = await fetch(
+    cloudCfg.url.replace(/\/$/, '') + '/rest/v1/dcsmp_data',
+    {
+      method: 'POST',
+      headers: {
+        'apikey': cloudCfg.key,
+        'Authorization': 'Bearer ' + cloudCfg.key,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=ignore-duplicates,return=minimal'
+      },
+      body: JSON.stringify({ id: 1, data: { ocs: [] } })
+    }
+  );
+  // 即使冲突也不报错
+  return res.ok || res.status === 409;
+}
+
+async function connectCloud(silent){
+  if(!cloudCfg.url || !cloudCfg.key){
+    if(!silent) alert('请先填写 Supabase URL 和 Anon Key');
+    return false;
+  }
+  updateSyncUI('syncing', '正在连接云端…');
+  try{
+    await cloudInit();
+    const row = await cloudGet();
+    if(!row){
+      // 云端没有数据：把本地推上去
+      await cloudPut({ ocs: ocs });
+      updateSyncUI('on', '已连接云端 · 已上传本地数据');
+    }else{
+      const cloudOcs = row.data && Array.isArray(row.data.ocs) ? row.data.ocs : null;
+      if(!cloudOcs || cloudOcs.length === 0){
+        await cloudPut({ ocs: ocs });
+        updateSyncUI('on', '已连接云端 · 已上传本地数据');
+      }else{
+        // 有数据：询问用户
+        const useCloud = confirm(
+          '云端已有数据（' + cloudOcs.length + ' 个角色）。\n\n' +
+          '点击「确定」用云端数据覆盖本地\n' +
+          '点击「取消」用本地数据覆盖云端'
+        );
+        if(useCloud){
+          ocs = normalizeList(cloudOcs);
+          saveLocal();
+          renderChips(); renderList();
+          updateSyncUI('on', '已连接云端 · 已拉取云端数据');
+        }else{
+          await cloudPut({ ocs: ocs });
+          updateSyncUI('on', '已连接云端 · 已上传本地数据');
+        }
+      }
+    }
+    cloudConnected = true;
+    startAutoSync();
+    return true;
+  }catch(e){
+    console.error(e);
+    updateSyncUI('error', '连接失败: ' + (e.message || e));
+    if(!silent) alert('连接失败：' + (e.message || e) + '\n\n请检查 URL、Key 以及数据库表是否已创建。');
+    return false;
+  }
+}
+
+function disconnectCloud(){
+  cloudConnected = false;
+  stopAutoSync();
+  updateSyncUI('', '本地模式');
+}
+
+async function pushToCloud(){
+  if(!cloudCfg.url || !cloudCfg.key){
+    alert('请先配置云端连接');
+    return;
+  }
+  updateSyncUI('syncing', '正在上传…');
+  try{
+    await cloudPut({ ocs: ocs });
+    updateSyncUI('on', '已上传 · ' + new Date().toLocaleTimeString());
+  }catch(e){
+    console.error(e);
+    updateSyncUI('error', '上传失败: ' + (e.message || e));
+  }
+}
+
+async function pullFromCloud(){
+  if(!cloudCfg.url || !cloudCfg.key){
+    alert('请先配置云端连接');
+    return;
+  }
+  updateSyncUI('syncing', '正在拉取…');
+  try{
+    const row = await cloudGet();
+    if(row && row.data && Array.isArray(row.data.ocs) && row.data.ocs.length){
+      if(!confirm('确定用云端数据覆盖本地？本地未保存的修改将丢失。')) {
+        updateSyncUI('on', '已连接云端');
+        return;
+      }
+      ocs = normalizeList(row.data.ocs);
+      saveLocal();
+      renderChips(); renderList();
+      if(g3dOpen) rebuildGraph3D();
+      if(sheet.classList.contains('open') && currentId){
+        const oc = byId(currentId);
+        if(oc){ renderGraph(oc); renderInfo(oc); }
+      }
+      updateSyncUI('on', '已拉取 · ' + new Date().toLocaleTimeString());
+    }else{
+      updateSyncUI('on', '云端暂无数据');
+    }
+  }catch(e){
+    console.error(e);
+    updateSyncUI('error', '拉取失败: ' + (e.message || e));
+  }
+}
+
+function schedulePush(){
+  if(pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(()=>{
+    pushToCloud();
+  }, 1200);
+}
+
+function startAutoSync(){
+  stopAutoSync();
+  // 每 30 秒拉取一次（自动同步其他人的修改）
+  pullTimer = setInterval(async ()=>{
+    if(!cloudConnected || document.hidden) return;
+    try{
+      const row = await cloudGet();
+      if(!row) return;
+      const cloudOcs = row.data && Array.isArray(row.data.ocs) ? row.data.ocs : null;
+      if(!cloudOcs) return;
+      // 简单冲突检测：比较 JSON
+      const localStr = JSON.stringify(ocs);
+      const cloudStr = JSON.stringify(cloudOcs);
+      if(localStr !== cloudStr){
+        ocs = normalizeList(cloudOcs);
+        saveLocal();
+        renderChips(); renderList();
+        if(g3dOpen) rebuildGraph3D();
+        if(sheet.classList.contains('open') && currentId){
+          const oc = byId(currentId);
+          if(oc){ renderGraph(oc); renderInfo(oc); }
+        }
+        updateSyncUI('on', '已自动同步 · ' + new Date().toLocaleTimeString());
+      }
+    }catch(e){ /* 静默失败 */ }
+  }, 30000);
+}
+
+function stopAutoSync(){
+  if(pullTimer){ clearInterval(pullTimer); pullTimer = null; }
+}
+
+/* =========================================================
+   设置面板开关
+   ========================================================= */
+let settingsOpen = false;
+function openSettings(){
+  settingsOpen = true;
+  const overlay = document.getElementById('settings-overlay');
+  document.getElementById('cfg-url').value = cloudCfg.url || '';
+  document.getElementById('cfg-key').value = cloudCfg.key || '';
+  if(cloudConnected){
+    updateSyncUI('on', '已连接云端');
+  }else{
+    updateSyncUI('', '未连接云端 · 使用本地存储');
+  }
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSettings(){
+  settingsOpen = false;
+  document.getElementById('settings-overlay').classList.remove('open');
+  if(!sheet.classList.contains('open') && !g3dOpen){
+    document.body.style.overflow = '';
+  }
+}
+
+/* =========================================================
+   事件绑定
+   ========================================================= */
+document.getElementById('sheet-close').onclick = () => {
+  if(editing){
+    const oc = byId(currentId);
+    editing = false;
+    if(oc) renderInfo(oc);
+    return;
+  }
+  closeDetail();
+};
+
+document.getElementById('sheet-edit').onclick = () => {
+  if(editing){
+    const oc = byId(currentId);
+    editing = false;
+    if(oc) renderInfo(oc);
+  }else{
+    startEdit();
+  }
+};
+
+document.getElementById('search').addEventListener('input', e=>{
+  query = e.target.value;
+  renderList();
+});
+
+document.getElementById('btn-3d').onclick = openGraph3D;
+document.getElementById('g3d-close').onclick = closeGraph3D;
+
+document.getElementById('g3d-reset').onclick = () => {
+  G3D.rotX = -0.28; G3D.rotY = 0.5; G3D.camDist = 620;
+};
+
+document.getElementById('g3d-rotate').onclick = function(){
+  G3D.autoRotate = !G3D.autoRotate;
+  this.classList.toggle('on', G3D.autoRotate);
+};
+
+document.getElementById('btn-new').onclick = () => {
+  const id = 'oc_' + Date.now().toString(36);
+  ocs.push({
+    id, name:'新角色', short:'新角色',
+    camp:'中立', campDetail:'', age:'', intro:'', rels:[]
+  });
+  saveLocal();
+  if(cloudConnected) schedulePush();
+  renderChips(); renderList();
+  openDetail(id);
+  startEdit();
+};
+
+document.getElementById('btn-reset').onclick = () => {
+  if(!confirm('确定要重置为初始设定吗？所有编辑内容将丢失。')) return;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  ocs = normalizeList(clone(DEFAULT_OCS));
+  activeCamp = '全部'; query = '';
+  document.getElementById('search').value = '';
+  closeDetail();
+  renderChips(); renderList();
+  if(g3dOpen) rebuildGraph3D();
+  saveLocal();
+  if(cloudConnected) schedulePush();
+};
+
+/* 设置面板 */
+document.getElementById('btn-sync').onclick = openSettings;
+document.getElementById('settings-close').onclick = closeSettings;
+
+document.getElementById('btn-connect').onclick = async () => {
+  cloudCfg.url = document.getElementById('cfg-url').value.trim();
+  cloudCfg.key = document.getElementById('cfg-key').value.trim();
+  saveCfg();
+  await connectCloud(false);
+};
+
+document.getElementById('btn-push').onclick = pushToCloud;
+document.getElementById('btn-pull').onclick = pullFromCloud;
+
+document.getElementById('btn-disconnect').onclick = () => {
+  if(!confirm('确定断开云端连接？断开后仅使用本地存储。')) return;
+  disconnectCloud();
+  saveCfg();
+};
+
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Escape') return;
+  if(settingsOpen){ closeSettings(); return; }
+  if(sheet.classList.contains('open')){
+    document.getElementById('sheet-close').click();
+  }else if(g3dOpen){
+    closeGraph3D();
+  }
+});
+
+/* =========================================================
+   启动
+   ========================================================= */
+renderChips();
+renderList();
+
+// 如果已配置云端，自动尝试连接（静默）
+if(cloudCfg.url && cloudCfg.key){
+  connectCloud(true);
+}else{
+  updateSyncUI('', '本地模式');
+}
+</script>
+</body>
+</html>
